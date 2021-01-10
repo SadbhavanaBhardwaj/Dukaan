@@ -1,4 +1,4 @@
-from .models import Product, Customer, ItemDetails, Cart
+from .models import Product, Customer, ItemDetail, Cart
 from rest_framework import serializers
 from seller.serializers import CategorySerializer
 from seller.models import Category
@@ -20,30 +20,16 @@ class ProductSerializer(serializers.ModelSerializer):
 class ItemDetailsSerializer(serializers.ModelSerializer):
 
     class Meta():
-        model = ItemDetails
-        fields = ['product', 'quantity']
+        model = ItemDetail
+        fields = ['product', 'quantity', 'cart']
     
 
 class CartSerializer(serializers.ModelSerializer):
-    item = ItemDetailsSerializer()
+    
     class Meta:
         model = Cart
-        fields = ['item', 'store_link']
-    def create(self, validated_data):
-        print(validated_data['item'])
-        print("===")
-        print(self.data)
-        print("===")
-        print(validated_data['item'])
-        items = validated_data['item']
-        for item in items:
-            print(validated_data['item'])
-        #c, _ = Cart.objects.get_or_create(name=validated_data['item'])
-        #validated_data.pop('category')
-        #validated_data.update({'category': c})
-        #product = Product.objects.create(**validated_data)
-        return "product"
-
+        fields = ['store_link']
+    
 
 class CustomerSerializer(serializers.ModelSerializer):
     otp = serializers.CharField(max_length=5, read_only=True)

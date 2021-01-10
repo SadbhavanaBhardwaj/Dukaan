@@ -1,5 +1,5 @@
 from .models import Owner, Store, Category
-from buyer.models import Customer, ItemDetails, Cart
+from buyer.models import Customer, Cart
 from rest_framework import serializers
 
 class OwnerSerializer(serializers.ModelSerializer):

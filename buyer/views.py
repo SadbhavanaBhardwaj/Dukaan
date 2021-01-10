@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from django.http import HttpResponse
 import json
 from .serializers import CartSerializer, CustomerSerializer
-from .models import Store, Product, Order, Cart, Customer
+from .models import Store, Product, Order, Cart, Customer, ItemDetail
 # Create your views here.
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
@@ -40,16 +40,32 @@ class ProductDetails(APIView):
 
 
 class CartItemsAPIView(APIView):
+    """
+        if pk of cart isnot  provided in the body, then a new cart is created,
+        otherwise items are added to that cart
+        for a given cart, if the product is already present then only the quantity is change 
+        otherwise the product is added to the cart or removed from the cart
+    """
     serializer_class = CartSerializer
     def post(self, request):
         data = request.data
         print(data)
-        serializer = CartSerializer(data=data)      
-        if serializer.is_valid():
-            serializer.save()
+        if 'pk' in request.data:
+            cart = Cart.objects.get(id=data['pk'])
         else:
-            print(serializer.errors)
-        return HttpResponse("")
+            cart = Cart.objects.create(store_link=data['store_link']) 
+        product_id = data['product_id']
+        quantity = data['quantity']
+        product = Product.objects.get(id=product_id)
+        if ItemDetail.objects.filter(product=product, cart=cart):
+            item = ItemDetail.objects.get(product=product, cart=cart)
+            item.quantity = quantity
+            item.save()
+            if quantity == 0:
+                item.delete()
+        else:
+            item = ItemDetail.objects.create(product=product, quantity=quantity, cart=cart)
+        return HttpResponse(json.dumps({"data": "cart has been updated"}), content_type='application/json')
 
 
 class OrderAPIView(APIView):

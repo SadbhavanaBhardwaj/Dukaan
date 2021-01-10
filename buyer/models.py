@@ -18,16 +18,17 @@ class Product(models.Model):
     store = models.ForeignKey(Store, on_delete=models.CASCADE)
 
 
-class ItemDetails(models.Model):
+class Cart(models.Model):
+    store_link = models.CharField(max_length=255)
+
+
+class ItemDetail(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
 
 class Customer(auth.models.User):
     address = models.CharField(max_length=500)
-
-class Cart(models.Model):
-    item = models.ManyToManyField(ItemDetails)
-    store_link = models.CharField(max_length=255)
 
 
 class Order(models.Model):
